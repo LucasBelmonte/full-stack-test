@@ -22,7 +22,7 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['sometimes', 'required', 'exists:customers,id'],
+            'customer_id' => ['sometimes', 'required', 'exists:customers,id,team_id,' . \Lib\Tenancy\Tenant::current()->id()],
             'status' => ['sometimes', 'required', 'string', 'in:draft,pending,paid,overdue,cancelled'],
             'due_date' => ['sometimes', 'required', 'date', 'after_or_equal:issue_date'],
             'metadata' => ['nullable', 'array'],

@@ -14,13 +14,11 @@ class FeatureAuthorizationMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $name): Response
+    public function handle(Request $request, Closure $next, string $feature)
     {
-        if (! Features::check($request, $name)) {
-            abort(403, 'Unauthorized action.');
+        if (!$request->user()?->hasFeature($feature)) {
+            abort(Response::HTTP_FORBIDDEN);
         }
-
-        Features::prepareForUsage($request, $name);
 
         return $next($request);
     }

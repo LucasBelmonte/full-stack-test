@@ -44,34 +44,38 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-        $validated = $request->validated();
+        $invoice = \DB::transaction(function () use ($request) {
+            $validated = $request->validated();
 
-        // Calculate total amount from items
-        $totalAmount = collect($validated['items'])->sum(function ($item) {
-            return $item['quantity'] * $item['unit_price'];
-        });
+            // Calculate total amount from items
+            $totalAmount = collect($validated['items'])->sum(function ($item) {
+                return $item['quantity'] * $item['unit_price'];
+            });
 
-        // Create invoice
-        $invoice = Invoice::create([
-            'customer_id' => $validated['customer_id'],
-            'status' => $validated['status'],
-            'amount' => $totalAmount,
-            'issue_date' => $validated['issue_date'],
-            'due_date' => $validated['due_date'],
-            'payment_date' => $validated['payment_date'] ?? null,
-            'metadata' => $validated['metadata'] ?? null,
-        ]);
-
-        // Create invoice items
-        foreach ($validated['items'] as $item) {
-            $invoice->invoiceItems()->create([
-                'title' => $item['title'],
-                'subtitle' => $item['subtitle'] ?? null,
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-                'amount' => $item['quantity'] * $item['unit_price'],
+            // Create invoice
+            $invoice = Invoice::create([
+                'customer_id' => $validated['customer_id'],
+                'status' => $validated['status'],
+                'amount' => $totalAmount,
+                'issue_date' => $validated['issue_date'],
+                'due_date' => $validated['due_date'],
+                'payment_date' => $validated['payment_date'] ?? null,
+                'metadata' => $validated['metadata'] ?? null,
             ]);
-        }
+
+            // Create invoice items
+            foreach ($validated['items'] as $item) {
+                $invoice->invoiceItems()->create([
+                    'title' => $item['title'],
+                    'subtitle' => $item['subtitle'] ?? null,
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'amount' => $item['quantity'] * $item['unit_price'],
+                ]);
+            }
+
+            return $invoice;
+        });
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', 'Invoice created successfully.');

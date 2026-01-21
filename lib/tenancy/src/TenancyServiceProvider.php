@@ -79,7 +79,7 @@ class TenancyServiceProvider extends ServiceProvider
     {
         // Por padrão, o current tenant não tem acesso a nenhum model (team_id = 0)!
         // A menos que o tenant seja o landlord, e que é explicitamente configurado pelo método asLandlord.
-        Tenant::makeCurrent(new TenantId(request()->get('team_id', 0)));
+        Tenant::makeCurrent(new TenantId(0));
 
         // Quando um usuário é deslogado, reseta-se o tenant atual.
         Event::listen(Logout::class, fn () => [Tenant::reset(), Tenant::makeCurrent(new TenantId(0))]);

@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
-                'teams' => fn() => $request->user()?->allTeams(),
+                'teams' => fn() => $request->user() ? $request->user()->allTeams() : [],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'view_localhost' => fn() => app()->isLocal(),
