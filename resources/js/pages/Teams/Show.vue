@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem } from '@/types/index';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';

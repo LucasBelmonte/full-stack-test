@@ -22,7 +22,7 @@ class StoreInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['required', 'exists:customers,id'],
+            'customer_id' => ['required', 'exists:customers,id,team_id,' . \Lib\Tenancy\Tenant::current()->id()],
             'status' => ['required', 'string', 'in:draft,pending,paid,overdue,cancelled'],
             'due_date' => ['required', 'date', 'after_or_equal:issue_date'],
             'metadata' => ['nullable', 'array'],

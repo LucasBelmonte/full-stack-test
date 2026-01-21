@@ -1,35 +1,63 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, router, useForm } from '@inertiajs/vue3';
-import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/AppLayout.vue'
+import { Head, router, useForm } from '@inertiajs/vue3'
+import { type BreadcrumbItem } from '@/types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { watch } from 'vue'
 
+/* Breadcrumbs */
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Customers',
-        href: '/customers',
-    },
-    {
-        title: 'Create',
-        href: '/customers/create',
-    },
-];
+  { title: 'Customers', href: '/customers' },
+  { title: 'Create', href: '/customers/create' },
+]
 
+/* Form */
 const form = useForm({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    document: '',
-});
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  document: '',
+})
 
+/* Máscara CPF / CNPJ */
+function maskCpfCnpj(value: string): string {
+  if (!value) return ''
+
+  const numbers = value.replace(/\D/g, '')
+
+  // CPF
+  if (numbers.length <= 11) {
+    return numbers
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+  }
+
+  // CNPJ
+  return numbers
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2')
+}
+
+/* Watch da máscara */
+watch(
+  () => form.document,
+  (value) => {
+    form.document = maskCpfCnpj(value)
+  }
+)
+
+/* Submit */
 const submit = () => {
-    form.post('/customers');
-};
+  form.post('/customers')
+}
 </script>
 
 <template>
@@ -85,17 +113,20 @@ const submit = () => {
                                 </p>
                             </div>
 
-                            <div class="space-y-2">
-                                <Label for="document">CPF/CNPJ</Label>
-                                <Input
-                                    id="document"
-                                    v-model="form.document"
-                                    placeholder="123-45-6789"
-                                />
-                                <p v-if="form.errors.document" class="text-sm text-destructive">
-                                    {{ form.errors.document }}
-                                </p>
-                            </div>
+                          <div class="space-y-2">
+                            <Label for="document">CPF/CNPJ</Label>
+
+                            <Input
+                              id="document"
+                              v-model="form.document"
+                              placeholder="CPF ou CNPJ"
+                              maxlength="18"
+                            />
+
+                            <p v-if="form.errors.document" class="text-sm text-destructive">
+                              {{ form.errors.document }}
+                            </p>
+                          </div>
 
                             <div class="space-y-2 md:col-span-2">
                                 <Label for="address">Address</Label>

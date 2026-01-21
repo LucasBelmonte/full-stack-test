@@ -11,12 +11,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
 ];
+const props = defineProps<{
+  auth: any
+  quote: {
+    message: string
+    author: string
+  }
+}>()
 </script>
 
 <template>
-    <Head title="Dashboard" />
+  <Head title="Dashboard" />
 
-    <AppLayout :breadcrumbs="breadcrumbs">
+  <AppLayout :breadcrumbs="breadcrumbs">
+    <!-- Quote -->
+    <blockquote class="mb-6 text-muted-foreground italic">
+      “{{ props.quote.message }}”
+      <footer class="mt-2 text-sm">
+        — {{ props.quote.author }}
+      </footer>
+    </blockquote>
+
         <div
             class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
         >

@@ -5,7 +5,7 @@ use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('auth/Login', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
@@ -23,6 +23,7 @@ Route::middleware([
         ->group(base_path('routes/admin.php'));
 
     Route::get('dashboard', fn() => inertia('Dashboard'))->name('dashboard');
+    Route::get('current-team', fn() => inertia('CurrentTeam'))->name('current-team');
 
     Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
     Route::post('invoices/{invoice}/issue', [\App\Http\Controllers\InvoiceController::class, 'issue'])
